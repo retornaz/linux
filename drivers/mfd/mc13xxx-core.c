@@ -753,7 +753,8 @@ err_revision:
 		mc13xxx_add_subdevice(mc13xxx, "%s-adc");
 
 	if (pdata->flags & MC13XXX_USE_CODEC)
-		mc13xxx_add_subdevice(mc13xxx, "%s-codec");
+		mc13xxx_add_subdevice_pdata(mc13xxx, "%s-codec",
+					pdata->codec, sizeof(*pdata->codec));
 
 	mc13xxx_add_subdevice_pdata(mc13xxx, "%s-regulator",
 		&pdata->regulators, sizeof(pdata->regulators));
