@@ -197,6 +197,7 @@ static int __init marxbot_cam_init(void)
 	if (ret)
 		return ret;
 	gpio_direction_output(CAM_CHOICE, 0);
+	gpio_export(CAM_CHOICE, false);
 
 	ret = gpio_request(BASECAM_RST_B, "basecam-reset");
 	if (ret)
@@ -211,6 +212,7 @@ static int __init marxbot_cam_init(void)
 	if (ret)
 		return ret;
 	gpio_direction_output(TURRETCAM_RST_B, 1);
+	gpio_export(TURRETCAM_RST_B, false);
 	ret = gpio_request(TURRETCAM_POWER, "turretcam-standby");
 	if (ret)
 		return ret;
