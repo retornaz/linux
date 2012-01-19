@@ -61,6 +61,8 @@ static irqreturn_t button_irq(int irq, void *_priv)
 	mc13xxx_irq_ack(priv->mc13783, irq);
 	mc13xxx_reg_read(priv->mc13783, MC13783_REG_INTERRUPT_SENSE_1, &val);
 
+	kill_cad_pid(SIGINT, 1); 
+
 	switch (irq) {
 	case MC13783_IRQ_ONOFD1:
 		val = val & MC13783_IRQSENSE1_ONOFD1S ? 1 : 0;
