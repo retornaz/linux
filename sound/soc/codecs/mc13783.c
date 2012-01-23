@@ -100,9 +100,9 @@ struct mc13783_priv {
 
 	int mc13783_asp_val;
 	int mc13783_alsp_val;
-
 	enum mc13783_ssi_port adc_ssi_port;
 	enum mc13783_ssi_port dac_ssi_port;
+	int mc13783_ahsout_val;
 };
 
 static unsigned int mc13783_read(struct snd_soc_codec *codec,
@@ -537,6 +537,41 @@ static int mc13783_put_alsp(struct snd_kcontrol *kcontrol,
 	return 0;
 }
 
+static int mc13783_ahsout_i_get(struct snd_kcontrol *kcontrol,
+	struct snd_ctl_elem_value *ucontrol)
+{
+	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
+	struct mc13783_priv *priv = snd_soc_codec_get_drvdata(codec);
+
+	ucontrol->value.integer.value[0] = priv->mc13783_ahsout_val;
+
+	return 0;
+}
+
+static int mc13783_ahsout_i_put(struct snd_kcontrol *kcontrol,
+	struct snd_ctl_elem_value *ucontrol)
+{
+	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
+	struct mc13783_priv *priv = snd_soc_codec_get_drvdata(codec);
+	unsigned int reg;
+
+	priv->mc13783_ahsout_val = ucontrol->value.integer.value[0];
+
+	reg = mc13783_read(codec, MC13783_AUDIO_RX0);
+
+	reg &= ~((1 << 13) | (1 << 14));
+
+	if (priv->mc13783_ahsout_val == 1)
+		reg |= 1 << 13;
+	else if (priv->mc13783_ahsout_val == 2)
+		reg |= 1 << 14;
+
+
+	mc13783_write(codec, MC13783_AUDIO_RX0, reg);
+
+	return 0;
+}
+
 static int mc13783_pcm_get(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
@@ -708,6 +743,8 @@ static const char *mc13783_alsp[] = {"Off", "Codec", "Right"};
 
 static const char *mc13783_ahs[] = {"Codec", "Mixer"};
 
+static const char *mc13783_ahsout[] = {"Off", "Auto", "On"};
+
 static const char *mc13783_arxout[] = {"Codec", "Mixer"};
 
 static const char *mc13783_capture[] = {"off/off", "rxinl/rxinr",
@@ -726,6 +763,9 @@ static const struct soc_enum mc13783_enum_alsp =
 static const struct soc_enum mc13783_enum_ahs =
 	SOC_ENUM_SINGLE(MC13783_AUDIO_RX0, 11, ARRAY_SIZE(mc13783_ahs),
 			mc13783_ahs);
+
+static const struct soc_enum mc13783_enum_ahsout =
+	SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(mc13783_ahsout), mc13783_ahsout);
 
 static const struct soc_enum mc13783_enum_arxout =
 	SOC_ENUM_SINGLE(MC13783_AUDIO_RX0, 17, ARRAY_SIZE(mc13783_arxout),
@@ -746,6 +786,8 @@ static struct snd_kcontrol_new mc13783_control_list[] = {
 	SOC_ENUM("Ahs Source", mc13783_enum_ahs),
 	SOC_SINGLE("Ahsr enable", MC13783_AUDIO_RX0, 9, 1, 0),
 	SOC_SINGLE("Ahsl enable", MC13783_AUDIO_RX0, 10, 1, 0),
+	SOC_ENUM_EXT("Ahs enable", mc13783_enum_ahsout, mc13783_ahsout_i_get,
+			mc13783_ahsout_i_put),
 	SOC_ENUM("Arxout Source", mc13783_enum_arxout),
 	SOC_SINGLE("ArxoutR enable", MC13783_AUDIO_RX0, 16, 1, 0),
 	SOC_SINGLE("ArxoutL enable", MC13783_AUDIO_RX0, 15, 1, 0),
