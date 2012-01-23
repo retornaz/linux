@@ -802,6 +802,7 @@ static struct snd_kcontrol_new mc13783_control_list[] = {
 	SOC_DOUBLE("PCM Capture Volume", MC13783_AUDIO_TX, 19, 14, 31, 0),
 	SOC_ENUM("3D Control", mc13783_enum_3d_mixer),
 	SOC_SINGLE("MC1 Bias enable", 38, 0, 1, 0),
+	SOC_SINGLE("MC2 Bias enable", 38, 1, 1, 0),
 	SOC_SINGLE("Codec Bypass enable", MC13783_AUDIO_CODEC, 16, 1, 0),
 	SOC_SINGLE_EXT("Voice Codec Switch", 0, 0, 1, 0, mc13783_voice_get,
 			mc13783_voice_put),
