@@ -632,10 +632,11 @@ static int mt9t031_s_power(struct v4l2_subdev *sd, int on)
 static int mt9t031_video_probe(struct i2c_client *client)
 {
 	struct mt9t031 *mt9t031 = to_mt9t031(client);
+	struct soc_camera_subdev_desc *ssdd = soc_camera_i2c_to_desc(client);
 	s32 data;
 	int ret;
 
-	ret = mt9t031_s_power(&mt9t031->subdev, 1);
+	ret = soc_camera_power_on(&client->dev, ssdd);
 	if (ret < 0)
 		return ret;
 
@@ -664,7 +665,7 @@ static int mt9t031_video_probe(struct i2c_client *client)
 	ret = v4l2_ctrl_handler_setup(&mt9t031->hdl);
 
 done:
-	mt9t031_s_power(&mt9t031->subdev, 0);
+	soc_camera_power_off(&client->dev, ssdd);
 
 	return ret;
 }
