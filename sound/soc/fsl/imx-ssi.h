@@ -210,6 +210,8 @@ struct imx_ssi {
 	struct imx_dma_data filter_data_tx;
 	struct imx_dma_data filter_data_rx;
 
+	int fiq_init;
+	int dma_init;
 	int enabled;
 };
 
