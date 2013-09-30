@@ -1347,6 +1347,8 @@ static int __init sdma_probe(struct platform_device *pdev)
 	spin_lock_init(&sdma->channel_0_lock);
 
 	sdma->dev = &pdev->dev;
+	sdma->dev->dma_mask = &sdma->dev->coherent_dma_mask;
+	sdma->dev->coherent_dma_mask = DMA_BIT_MASK(32);
 
 	iores = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	irq = platform_get_irq(pdev, 0);
