@@ -16,8 +16,10 @@
 #include <linux/platform_device.h>
 #include <linux/io.h>
 #include <linux/platform_data/usb-ehci-mxc.h>
+#include <linux/gpio.h>
 
 #include "hardware.h"
+#include "iomux-mx3.h"
 
 #define USBCTRL_OTGBASE_OFFSET	0x600
 
@@ -35,9 +37,12 @@
 #define MX31_H1_PM_BIT		(1 << 8)
 #define MX31_H1_DT_BIT		(1 << 4)
 
+#define USBH2_EN_B IOMUX_TO_GPIO(MX31_PIN_SCK6)
+
 int mx31_initialize_usb_hw(int port, unsigned int flags)
 {
 	unsigned int v;
+	unsigned int do_it;
 
 	v = readl(MX31_IO_ADDRESS(MX31_USB_BASE_ADDR + USBCTRL_OTGBASE_OFFSET));
 
@@ -70,13 +75,15 @@ int mx31_initialize_usb_hw(int port, unsigned int flags)
 
 		if (!(flags & MXC_EHCI_TTL_ENABLED))
 			v |= MX31_H2_DT_BIT;
-
+		do_it = 1;
 		break;
 	default:
 		return -EINVAL;
 	}
 
 	writel(v, MX31_IO_ADDRESS(MX31_USB_BASE_ADDR + USBCTRL_OTGBASE_OFFSET));
+
+	gpio_set_value(USBH2_EN_B, 0);
 
 	return 0;
 }
